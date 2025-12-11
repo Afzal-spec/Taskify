@@ -25,26 +25,35 @@ namespace Taskify.Api.Controllers
             return Ok(tasks);
         }
         [HttpPost]
-        public async Task<ActionResult<TaskItem>> CreateTaskItem(TaskItem taskItem)
+        public async Task<ActionResult<TaskItem>> CreateTask(TaskItem taskItem)
         {
             dbContext.Tasks.Add(taskItem);
             await dbContext.SaveChangesAsync();
             return Ok(taskItem);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<TaskItem>> GetItembyId(int id)
+        public async Task<ActionResult<TaskItem>> GetTaskbyId(int id)
         {
             var task = await dbContext.Tasks.SingleOrDefaultAsync(x => x.Id == id);
             if(task == null) return NotFound();
             return Ok(task);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateItem(int id, TaskItem taskItem)
+        public async Task<IActionResult> UpdateTask(int id, TaskItem taskItem)
         {
             if (id != taskItem.Id) return BadRequest();
             dbContext.Entry(taskItem).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
 
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTask(int id)
+        {
+            var taskItem = await dbContext.Tasks.FindAsync(id);
+            if(taskItem == null) return NotFound();
+            dbContext.Tasks.Remove(taskItem);
+            await dbContext.SaveChangesAsync();
             return NoContent();
         }
 
