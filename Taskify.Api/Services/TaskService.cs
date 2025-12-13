@@ -2,45 +2,45 @@
 using Taskify.Api.Data;
 using Taskify.Api.DTOs;
 using Taskify.Api.Models;
+using Taskify.Api.Repositories;
 
 namespace Taskify.Api.Services
 {
     public class TaskService
     {
-        private readonly AppDbContext dbContext;
+        private readonly ITaskItemRepository repo;
 
-        public TaskService(AppDbContext dbContext)
+        public TaskService(ITaskItemRepository repo)
         {
-            this.dbContext = dbContext;
+            this.repo = repo;
         }
 
         public async Task<List<TaskItem>> GetAllAsync()
         {
-            return await dbContext.Tasks.ToListAsync();
+            return (await repo.GetAllAsync()).ToList();
         }
 
         public async Task<TaskItem> GetByIdAsync(int id)
         {
-            return await dbContext.Tasks.FindAsync(id);
+            return await repo.GetByIdAsync(id);
         }
 
         public async Task<TaskItem> CreateAsync(CreateTaskItemDto dto)
         {
             var task = new TaskItem
             {
+                Id = dto.Id,
                 Title = dto.Title,
                 Description = dto.Description,
                 DueDate = dto.DueDate,
                 Priority = dto.Priority,
             };
-
-            await dbContext.SaveChangesAsync();
-            return task;
+            return await repo.AddAsync(task);
         }
 
         public async Task<bool> UpdateAsync(int id, UpdateTaskItemDto dto)
         {
-            var task = await dbContext.Tasks.FindAsync(id);
+            var task = await repo.GetByIdAsync(id);
             if (task == null) return false;
 
             task.Title = dto.Title;
@@ -49,17 +49,16 @@ namespace Taskify.Api.Services
             task.DueDate = dto.DueDate;
             task.Priority = dto.Priority;
 
-            await dbContext.SaveChangesAsync();
+            await repo.UpdateAsync(task);
             return true;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var task = await dbContext.Tasks.FindAsync(id);
+            var task = await repo.GetByIdAsync(id);
             if (task == null) return false;
 
-            dbContext.Tasks.Remove(task);
-            await dbContext.SaveChangesAsync();
+            await repo.DeleteAsync(task);
             return true;
         }
     }
