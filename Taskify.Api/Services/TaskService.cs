@@ -38,7 +38,7 @@ namespace Taskify.Api.Services
             return task;
         }
 
-        public async Task<bool> UpdateAsync(int id, TaskUpdateDto dto)
+        public async Task<bool> UpdateAsync(int id, UpdateTaskItemDto dto)
         {
             var task = await dbContext.Tasks.FindAsync(id);
             if (task == null) return false;
