@@ -71,6 +71,10 @@ namespace Taskify.Api.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await service.GetAllAsync());
+        }
 
     }
 
