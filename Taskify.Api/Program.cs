@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Taskify.Api.Data;
+using Taskify.Api.Repositories;
+using Taskify.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+builder.Services.AddScoped<TaskService>();
 
 var app = builder.Build();
 
