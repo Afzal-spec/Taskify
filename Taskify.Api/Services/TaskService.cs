@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Taskify.Api.Data;
 using Taskify.Api.DTOs;
 using Taskify.Api.Models;
@@ -9,10 +10,12 @@ namespace Taskify.Api.Services
     public class TaskService
     {
         private readonly ITaskItemRepository repo;
+        private readonly IMapper mapper;
 
-        public TaskService(ITaskItemRepository repo)
+        public TaskService(ITaskItemRepository repo, IMapper mapper)
         {
             this.repo = repo;
+            this.mapper = mapper;
         }
 
         public async Task<List<TaskItem>> GetAllAsync()
@@ -27,14 +30,8 @@ namespace Taskify.Api.Services
 
         public async Task<TaskItem> CreateAsync(CreateTaskItemDto dto)
         {
-            var task = new TaskItem
-            {
-                Id = dto.Id,
-                Title = dto.Title,
-                Description = dto.Description,
-                DueDate = dto.DueDate,
-                Priority = dto.Priority,
-            };
+            var task = mapper.Map<TaskItem>(dto);
+
             return await repo.AddAsync(task);
         }
 
@@ -43,11 +40,7 @@ namespace Taskify.Api.Services
             var task = await repo.GetByIdAsync(id);
             if (task == null) return false;
 
-            task.Title = dto.Title;
-            task.Description = dto.Description;
-            task.IsCompleted = dto.IsCompleted;
-            task.DueDate = dto.DueDate;
-            task.Priority = dto.Priority;
+            mapper.Map(dto, task);
 
             await repo.UpdateAsync(task);
             return true;
