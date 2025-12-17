@@ -23,7 +23,7 @@ namespace Taskify.Api.Services
             return (await repo.GetAllAsync()).ToList();
         }
 
-        public async Task<TaskItem> GetByIdAsync(int id)
+        public async Task<TaskItem> GetByIdAsync(Guid id)
         {
             return await repo.GetByIdAsync(id);
         }
@@ -35,7 +35,7 @@ namespace Taskify.Api.Services
             return await repo.AddAsync(task);
         }
 
-        public async Task<bool> UpdateAsync(int id, UpdateTaskItemDto dto)
+        public async Task<bool> UpdateAsync(Guid id, UpdateTaskItemDto dto)
         {
             var task = await repo.GetByIdAsync(id);
             if (task == null) return false;
@@ -46,13 +46,18 @@ namespace Taskify.Api.Services
             return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var task = await repo.GetByIdAsync(id);
             if (task == null) return false;
 
-            await repo.DeleteAsync(task);
+            await repo.SoftDeleteAsync(task);
             return true;
+        }
+
+        public async Task<TaskItem?> RestoreAsync(Guid id)
+        {
+            return await repo.RestoreAsync(id);
         }
     }
 }

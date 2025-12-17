@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Taskify.Api.Data;
@@ -10,6 +11,7 @@ namespace Taskify.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     //public class TaskController : ControllerBase
     //{
     //    private readonly AppDbContext dbContext;
@@ -77,8 +79,8 @@ namespace Taskify.Api.Controllers
         {
             return Ok(await service.GetAllAsync());
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> Get(Guid id)
         {
             var task = await service.GetByIdAsync(id);
             if (task == null) return NotFound();
@@ -90,19 +92,27 @@ namespace Taskify.Api.Controllers
             var created = await service.CreateAsync(dto);
             return Ok(created);
         }
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateTaskItemDto dto)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, UpdateTaskItemDto dto)
         {
             var success = await service.UpdateAsync(id, dto);
             if(!success) return NotFound();
             return NoContent();
         }
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
             var success = await service.DeleteAsync(id);
             if(!success) return NotFound();
             return NoContent();
+        }
+        [HttpPatch("{id}/restore")]
+
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            var task = await service.RestoreAsync(id);
+            if (task == null) return NotFound();
+            return Ok(task);
         }
 
     }

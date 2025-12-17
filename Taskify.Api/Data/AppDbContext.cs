@@ -10,5 +10,13 @@ namespace Taskify.Api.Data
         }
 
         public DbSet<TaskItem> Tasks { get; set; }
+        public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TaskItem>().HasQueryFilter(t => !t.IsDeleted);
+            base.OnModelCreating(modelBuilder);
+        }
+
     }
 }
