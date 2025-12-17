@@ -16,5 +16,7 @@ namespace Taskify.Api.Models
         public string Priority { get; set; } = "Medium";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

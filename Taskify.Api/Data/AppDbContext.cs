@@ -14,7 +14,17 @@ namespace Taskify.Api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TaskItem>().HasQueryFilter(t => !t.IsDeleted);
+            // Soft delete global filter
+            modelBuilder.Entity<TaskItem>()
+                .HasQueryFilter(t => !t.IsDeleted);
+
+            // 🔥 USER → TASK 1:N RELATIONSHIP
+            modelBuilder.Entity<TaskItem>()
+                .HasOne(t => t.User)
+                .WithMany(u => u.Tasks)
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             base.OnModelCreating(modelBuilder);
         }
 

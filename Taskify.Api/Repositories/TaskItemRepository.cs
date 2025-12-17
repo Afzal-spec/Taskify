@@ -29,11 +29,11 @@ namespace Taskify.Api.Repositories
             task.IsDeleted = true;
             await dbContext.SaveChangesAsync();
         }
-        public async Task<TaskItem?> RestoreAsync(Guid id)
+        public async Task<TaskItem?> RestoreAsync(Guid id, int userId)
         {
             var task = await dbContext.Tasks
                 .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Id == id);
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
             if (task == null)
                 return null;
@@ -45,14 +45,17 @@ namespace Taskify.Api.Repositories
 
 
 
-        public async Task<IEnumerable<TaskItem>> GetAllAsync()
+        public async Task<IEnumerable<TaskItem>> GetAllAsync(int userId)
         {
-            return await dbContext.Tasks.ToListAsync();
+            return await dbContext.Tasks
+            .Where(t => t.UserId == userId)
+            .ToListAsync();
         }
 
-        public async Task<TaskItem?> GetByIdAsync(Guid id)
+        public async Task<TaskItem?> GetByIdAsync(Guid id, int userId)
         {
-            return await dbContext.Tasks.FindAsync(id);
+            return await dbContext.Tasks
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
         public async Task SaveChangesAsync()

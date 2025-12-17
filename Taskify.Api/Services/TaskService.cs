@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Taskify.Api.Data;
 using Taskify.Api.DTOs;
+using Taskify.Api.Helpers;
 using Taskify.Api.Models;
 using Taskify.Api.Repositories;
 
@@ -11,33 +12,45 @@ namespace Taskify.Api.Services
     {
         private readonly ITaskItemRepository repo;
         private readonly IMapper mapper;
+        private readonly IHttpContextAccessor http;
 
-        public TaskService(ITaskItemRepository repo, IMapper mapper)
+
+        public TaskService(ITaskItemRepository repo, IMapper mapper, IHttpContextAccessor http)
         {
             this.repo = repo;
             this.mapper = mapper;
+            this.http = http;
+        }
+        private int GetUserId()
+        {
+            return http.HttpContext.GetUserId();
         }
 
         public async Task<List<TaskItem>> GetAllAsync()
         {
-            return (await repo.GetAllAsync()).ToList();
+            var userId = GetUserId();
+            return (await repo.GetAllAsync(userId)).ToList();
         }
 
         public async Task<TaskItem> GetByIdAsync(Guid id)
         {
-            return await repo.GetByIdAsync(id);
+            var userId = GetUserId();
+            var task = await repo.GetByIdAsync(id, userId);
+            return task == null ? null : task;
         }
 
         public async Task<TaskItem> CreateAsync(CreateTaskItemDto dto)
         {
+            var userId = GetUserId();
             var task = mapper.Map<TaskItem>(dto);
-
+            task.UserId = userId;
             return await repo.AddAsync(task);
         }
 
         public async Task<bool> UpdateAsync(Guid id, UpdateTaskItemDto dto)
         {
-            var task = await repo.GetByIdAsync(id);
+            var userId = GetUserId();
+            var task = await repo.GetByIdAsync(id, userId);
             if (task == null) return false;
 
             mapper.Map(dto, task);
@@ -48,7 +61,8 @@ namespace Taskify.Api.Services
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var task = await repo.GetByIdAsync(id);
+            var userId = GetUserId();
+            var task = await repo.GetByIdAsync(id, userId);
             if (task == null) return false;
 
             await repo.SoftDeleteAsync(task);
@@ -57,7 +71,8 @@ namespace Taskify.Api.Services
 
         public async Task<TaskItem?> RestoreAsync(Guid id)
         {
-            return await repo.RestoreAsync(id);
+            var userId = GetUserId();
+            return await repo.RestoreAsync(id, userId);
         }
     }
 }

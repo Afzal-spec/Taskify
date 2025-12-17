@@ -12,8 +12,8 @@ using Taskify.Api.Data;
 namespace Taskify.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251215101231_Init")]
-    partial class Init
+    [Migration("20251217054319_firstMigrationForUserTaskMap")]
+    partial class firstMigrationForUserTaskMap
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,7 +54,12 @@ namespace Taskify.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Tasks");
                 });
@@ -86,6 +91,22 @@ namespace Taskify.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Taskify.Api.Models.TaskItem", b =>
+                {
+                    b.HasOne("Taskify.Api.Models.User", "User")
+                        .WithMany("Tasks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Taskify.Api.Models.User", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }
