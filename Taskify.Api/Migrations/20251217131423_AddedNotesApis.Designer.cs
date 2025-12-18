@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taskify.Api.Data;
 
@@ -11,9 +12,11 @@ using Taskify.Api.Data;
 namespace Taskify.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251217131423_AddedNotesApis")]
+    partial class AddedNotesApis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,7 +129,7 @@ namespace Taskify.Api.Migrations
             modelBuilder.Entity("Taskify.Api.Models.Note", b =>
                 {
                     b.HasOne("Taskify.Api.Models.User", "User")
-                        .WithMany("Notes")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -147,8 +150,6 @@ namespace Taskify.Api.Migrations
 
             modelBuilder.Entity("Taskify.Api.Models.User", b =>
                 {
-                    b.Navigation("Notes");
-
                     b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618

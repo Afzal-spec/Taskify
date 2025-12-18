@@ -32,11 +32,11 @@ namespace Taskify.Api.Services
             return (await repo.GetAllAsync(userId)).ToList();
         }
 
-        public async Task<TaskItem> GetByIdAsync(Guid id)
+        public async Task<TaskItemDto> GetByIdAsync(Guid id)
         {
             var userId = GetUserId();
             var task = await repo.GetByIdAsync(id, userId);
-            return task == null ? null : task;
+            return task == null ? null : mapper.Map<TaskItemDto>(task);
         }
 
         public async Task<TaskItem> CreateAsync(CreateTaskItemDto dto)

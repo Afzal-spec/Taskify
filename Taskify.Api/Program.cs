@@ -47,9 +47,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<NoteService>();
 builder.Services.AddHttpContextAccessor();
+
 
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

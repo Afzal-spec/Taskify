@@ -10,6 +10,7 @@ namespace Taskify.Api.Mapping
         {
             CreateMap<CreateTaskItemDto, TaskItem>().ReverseMap();
             CreateMap<UpdateTaskItemDto, TaskItem>().ReverseMap();
+            CreateMap<TaskItemDto, TaskItem>().ReverseMap();
         }
     }
 }
