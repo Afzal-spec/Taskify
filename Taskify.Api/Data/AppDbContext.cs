@@ -11,6 +11,7 @@ namespace Taskify.Api.Data
 
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Note> Notes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,11 +19,20 @@ namespace Taskify.Api.Data
             modelBuilder.Entity<TaskItem>()
                 .HasQueryFilter(t => !t.IsDeleted);
 
+            modelBuilder.Entity<Note>()
+                .HasQueryFilter(n => !n.IsDeleted);
+
             // 🔥 USER → TASK 1:N RELATIONSHIP
             modelBuilder.Entity<TaskItem>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)
                 .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Note>()
+                .HasOne(n => n.User)
+                .WithMany(u => u.Notes)
+                .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
