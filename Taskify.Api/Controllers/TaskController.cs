@@ -114,6 +114,13 @@ namespace Taskify.Api.Controllers
             if (task == null) return NotFound();
             return Ok(task);
         }
+        [HttpGet("deleted")]
+        public async Task<IActionResult> GetDeletedTask()
+        {
+            var task = await service.GetDeletedAsync();
+            if(task == null) return NotFound();
+            return Ok(task);
+        }
 
     }
 

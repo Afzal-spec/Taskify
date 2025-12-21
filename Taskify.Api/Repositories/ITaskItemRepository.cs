@@ -12,5 +12,6 @@ namespace Taskify.Api.Repositories
         Task SoftDeleteAsync(TaskItem task);
         Task<TaskItem?> RestoreAsync(Guid id, int userId);
         Task SaveChangesAsync();
+        Task<IEnumerable<TaskItem>?> GetDeletedAsync(int UserId);
     }
 }

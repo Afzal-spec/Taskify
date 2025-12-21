@@ -68,5 +68,14 @@ namespace Taskify.Api.Repositories
             dbContext.Tasks.Update(task);
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<TaskItem>> GetDeletedAsync(int userId)
+        {
+            return await dbContext.Tasks
+                .IgnoreQueryFilters()
+                .Where(t => t.IsDeleted && t.UserId == userId)
+                .ToListAsync();
+        }
+
     }
 }

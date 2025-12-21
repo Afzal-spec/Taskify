@@ -74,5 +74,10 @@ namespace Taskify.Api.Services
             var userId = GetUserId();
             return await repo.RestoreAsync(id, userId);
         }
+        public async Task<List<TaskItem>> GetDeletedAsync()
+        {
+            var userId = GetUserId();
+            return (await repo.GetDeletedAsync(userId)).ToList();
+        }
     }
 }
