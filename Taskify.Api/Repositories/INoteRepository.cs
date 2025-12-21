@@ -1,4 +1,5 @@
-﻿using Taskify.Api.Models;
+﻿using System.ComponentModel;
+using Taskify.Api.Models;
 
 namespace Taskify.Api.Repositories
 {
@@ -9,5 +10,7 @@ namespace Taskify.Api.Repositories
         Task<Note> AddAsync(Note note);
         Task<Note> UpdateAsync(Note note);
         Task SoftDeleteAsync(Note note);
+        Task<IEnumerable<Note>> GetDeletedAsync(int  userId);
+        Task<Note?> RestoreAsync(Guid id, int userId);
     }
 }

@@ -42,5 +42,27 @@ namespace Taskify.Api.Repositories
             await dbContext.SaveChangesAsync();
             return note;
         }
+        public async Task<IEnumerable<Note>?> GetDeletedAsync(int userId)
+        {
+            return await dbContext.Notes
+                .IgnoreQueryFilters()
+                .Where(n => n.IsDeleted && n.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<Note?> RestoreAsync(Guid id, int userId)
+        {
+            var note = await dbContext.Notes
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId && n.IsDeleted);
+
+            if (note == null)
+                return null;
+
+            note.IsDeleted = false;
+            await dbContext.SaveChangesAsync();
+            return note;
+        }
+
     }
 }

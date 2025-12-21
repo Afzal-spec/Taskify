@@ -47,5 +47,20 @@ namespace Taskify.Api.Controllers
             var success = await service.DeleteAsync(id);
             return success ? Ok(): NotFound();
         }
+        [HttpGet("deleted")]
+        public async Task<IActionResult> GetDeletedNote()
+        {
+            var note = await service.GetDeletedAsync();
+            if (note == null) return NotFound();
+            return Ok(note);
+        }
+        [HttpPatch("{id}/restore")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            var note = await service.RestoreAsync(id);
+            if (note == null) return NotFound();
+            return Ok(note);
+        }
+
     }
 }

@@ -67,5 +67,18 @@ namespace Taskify.Api.Services
             await repo.SoftDeleteAsync(note);
             return true;
         }
+        public async Task<List<NoteDto>> GetDeletedAsync()
+        {
+            var userId = GetUserId();
+            var notes = await repo.GetDeletedAsync(userId);
+
+            return mapper.Map<List<NoteDto>>(notes);
+        }
+        public async Task<NoteDto?> RestoreAsync(Guid id)
+        {
+            var userId = GetUserId();
+            var note = await repo.RestoreAsync(id, userId);
+            return note == null ? null : mapper.Map<NoteDto>(note);
+        }
     }
 }
