@@ -33,6 +33,25 @@ namespace Taskify.Api.Repositories
                 .FirstOrDefaultAsync(j => j.Date.Date == date.Date && j.UserId == userId);
         }
 
+        public async Task<List<JournalEntry>> GetDeletedAsync(int userId)
+        {
+            return await dbContext.JournalEntries
+                .IgnoreQueryFilters()
+                .Where(j => j.UserId == userId && j.IsDeleted)
+                .OrderByDescending(j => j.Date)
+                .ToListAsync();
+        }
+
+        public async Task<JournalEntry?> GetDeletedByDateAsync(DateTime date, int userId)
+        {
+            return await dbContext.JournalEntries
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(j =>
+                    j.Date.Date == date.Date &&
+                    j.UserId == userId &&
+                    j.IsDeleted);
+        }
+
         public async Task SoftDeleteAsync(JournalEntry entry)
         {
             entry.IsDeleted = true;

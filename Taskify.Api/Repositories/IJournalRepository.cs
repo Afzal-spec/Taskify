@@ -9,5 +9,8 @@ namespace Taskify.Api.Repositories
         Task<JournalEntry> AddAsync(JournalEntry entry);
         Task UpdateAsync(JournalEntry entry);
         Task SoftDeleteAsync(JournalEntry entry);
+        Task<List<JournalEntry>> GetDeletedAsync(int userId);
+        Task<JournalEntry?> GetDeletedByDateAsync(DateTime date, int userId);
+
     }
 }
