@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Taskify.Api.Data;
 
@@ -11,9 +12,11 @@ using Taskify.Api.Data;
 namespace Taskify.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251221132915_AddJournalEntries")]
+    partial class AddJournalEntries
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,61 +24,6 @@ namespace Taskify.Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Taskify.Api.Models.Habit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Frequency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsArchived")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Habits");
-                });
-
-            modelBuilder.Entity("Taskify.Api.Models.HabitLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("HabitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HabitId");
-
-                    b.ToTable("HabitLogs");
-                });
 
             modelBuilder.Entity("Taskify.Api.Models.JournalEntry", b =>
                 {
@@ -214,28 +162,6 @@ namespace Taskify.Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Taskify.Api.Models.Habit", b =>
-                {
-                    b.HasOne("Taskify.Api.Models.User", "User")
-                        .WithMany("Habits")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Taskify.Api.Models.HabitLog", b =>
-                {
-                    b.HasOne("Taskify.Api.Models.Habit", "Habit")
-                        .WithMany("Logs")
-                        .HasForeignKey("HabitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Habit");
-                });
-
             modelBuilder.Entity("Taskify.Api.Models.JournalEntry", b =>
                 {
                     b.HasOne("Taskify.Api.Models.User", "User")
@@ -269,15 +195,8 @@ namespace Taskify.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Taskify.Api.Models.Habit", b =>
-                {
-                    b.Navigation("Logs");
-                });
-
             modelBuilder.Entity("Taskify.Api.Models.User", b =>
                 {
-                    b.Navigation("Habits");
-
                     b.Navigation("Notes");
 
                     b.Navigation("Tasks");
