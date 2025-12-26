@@ -1,13 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Taskify.Api.Models;
+
 namespace Taskify.Api.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-            
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<TaskItem> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
@@ -16,18 +14,17 @@ namespace Taskify.Api.Data
         public DbSet<Habit> Habits { get; set; }
         public DbSet<HabitLog> HabitLogs { get; set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Soft delete global filter
             modelBuilder.Entity<TaskItem>()
                 .HasQueryFilter(t => !t.IsDeleted);
 
             modelBuilder.Entity<Note>()
                 .HasQueryFilter(n => !n.IsDeleted);
 
-            // 🔥 USER → TASK 1:N RELATIONSHIP
+            modelBuilder.Entity<JournalEntry>()
+                .HasQueryFilter(j => !j.IsDeleted);
+
             modelBuilder.Entity<TaskItem>()
                 .HasOne(t => t.User)
                 .WithMany(u => u.Tasks)
@@ -39,9 +36,6 @@ namespace Taskify.Api.Data
                 .WithMany(u => u.Notes)
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<JournalEntry>()
-                .HasQueryFilter(j => !j.IsDeleted);
 
             modelBuilder.Entity<JournalEntry>()
                 .HasIndex(j => new { j.UserId, j.Date })
@@ -59,8 +53,9 @@ namespace Taskify.Api.Data
                 .HasForeignKey(hl => hl.HabitId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<HabitLog>()
+                .HasIndex(hl => new { hl.HabitId, hl.Date })
+                .IsUnique();
         }
-
     }
 }
