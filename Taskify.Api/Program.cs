@@ -50,12 +50,14 @@ builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IJournalRepository, JournalRepository>();
 builder.Services.AddScoped<IHabitRepository, HabitRepository>();
+builder.Services.AddScoped<IHabitLogRepository, HabitLogRepository>();
 
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<JournalService>();
 builder.Services.AddScoped<HabitService>();
+builder.Services.AddScoped<HabitLogService>();
 builder.Services.AddHttpContextAccessor();
 
 

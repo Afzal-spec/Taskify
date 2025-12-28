@@ -9,6 +9,9 @@ namespace Taskify.Api.Repositories
         Task<List<HabitLog>> GetByHabitAsync(Guid habitId, int userId);
         Task UpdateAsync(HabitLog log, int userId);
         Task<List<HabitLog>> GetByDateAsync(DateTime date, int userId);
+        Task<List<HabitLog>> GetCompletedLogsAsync(Guid habitId, int userId);
+        Task<List<DateTime>> GetCompletedDatesAsync(Guid habitId, int userId);
+
 
     }
 }

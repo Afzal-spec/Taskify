@@ -105,6 +105,104 @@ namespace Taskify.Api.Services
 
             return result;
         }
+        public async Task<HabitStreakDto> GetCurrentStreakAsync(Guid habitId)
+        {
+            var userId = GetUserId();
+
+            // 🔐 Validate habit ownership
+            var habit = await habitRepo.GetByIdAsync(habitId, userId);
+            if (habit == null)
+                throw new Exception("Habit not found");
+
+            var logs = await repo.GetCompletedLogsAsync(habitId, userId);
+
+            if (!logs.Any())
+            {
+                return new HabitStreakDto
+                {
+                    HabitId = habit.Id,
+                    HabitName = habit.Name,
+                    Frequency = habit.Frequency,
+                    CurrentStreak = 0
+                };
+            }
+
+            var today = DateTime.UtcNow.Date;
+            var streak = 0;
+            var expectedDate = today;
+
+            foreach (var log in logs)
+            {
+                if (log.Date.Date == expectedDate)
+                {
+                    streak++;
+                    expectedDate = expectedDate.AddDays(-1);
+                }
+                else if (log.Date.Date < expectedDate)
+                {
+                    break; // ❌ gap → streak ends
+                }
+            }
+
+            return new HabitStreakDto
+            {
+                HabitId = habit.Id,
+                HabitName = habit.Name,
+                Frequency = habit.Frequency,
+                CurrentStreak = streak
+            };
+        }
+
+        public async Task<HabitStreakDto> GetStreakAsync(Guid habitId)
+        {
+            var userId = GetUserId();
+
+            var habit = await habitRepo.GetByIdAsync(habitId, userId);
+            if (habit == null)
+                throw new Exception("Habit not found");
+
+            var logs = await repo.GetByHabitAsync(habitId, userId);
+
+            if (!logs.Any())
+                return mapper.Map<HabitStreakDto>((habit, 0, 0));
+
+            var dates = logs
+                .Where(l => l.IsCompleted)
+                .Select(l => l.Date.Date)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToList();
+
+            // ---------- Longest Streak ----------
+            int longestStreak = 1;
+            int tempStreak = 1;
+
+            for (int i = 1; i < dates.Count; i++)
+            {
+                if (dates[i] == dates[i - 1].AddDays(1))
+                    tempStreak++;
+                else
+                    tempStreak = 1;
+
+                longestStreak = Math.Max(longestStreak, tempStreak);
+            }
+
+            // ---------- Current Streak ----------
+            int currentStreak = 0;
+            var lookup = new HashSet<DateTime>(dates);
+
+            DateTime day = DateTime.UtcNow.Date;
+
+            while (lookup.Contains(day))
+            {
+                currentStreak++;
+                day = day.AddDays(-1);
+            }
+
+            return mapper.Map<HabitStreakDto>((habit, currentStreak, longestStreak));
+        }
+
+
 
 
     }

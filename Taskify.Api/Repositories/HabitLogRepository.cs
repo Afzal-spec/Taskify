@@ -55,6 +55,41 @@ namespace Taskify.Api.Repositories
                 )
                 .ToListAsync();
         }
+        public async Task<List<HabitLog>> GetCompletedLogsAsync(Guid habitId, int userId)
+        {
+            return await dbContext.HabitLogs
+                .Include(l => l.Habit)
+                .Where(l =>
+                    l.HabitId == habitId &&
+                    l.Habit.UserId == userId &&
+                    l.IsCompleted
+                )
+                .OrderByDescending(l => l.Date)
+                .ToListAsync();
+        }
+        public async Task<List<DateTime>> GetCompletedDatesAsync(Guid habitId, int userId)
+        {
+            return await dbContext.HabitLogs
+                .Where(l =>
+                    l.HabitId == habitId &&
+                    l.Habit.UserId == userId &&
+                    l.IsCompleted
+                )
+                .Select(l => l.Date.Date)
+                .OrderBy(d => d)
+                .ToListAsync();
+        }
+        public async Task<List<HabitLog>> GetLogsForHabitAsync(Guid habitId)
+        {
+            return await dbContext.HabitLogs
+                .Include(l => l.Habit)
+                .Where(l => l.HabitId == habitId && l.IsCompleted)
+                .OrderBy(l => l.Date)
+                .ToListAsync();
+        }
+
+
+
 
     }
 }
