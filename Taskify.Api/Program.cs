@@ -58,6 +58,7 @@ builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<JournalService>();
 builder.Services.AddScoped<HabitService>();
 builder.Services.AddScoped<HabitLogService>();
+builder.Services.AddScoped<DashBoardService>();
 builder.Services.AddHttpContextAccessor();
 
 
