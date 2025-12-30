@@ -28,6 +28,20 @@ namespace Taskify.Api.Controllers
             return Ok(await dashBoardService.GetHabitStreakSummaryAsync());
         }
 
+        [HttpGet("tasks/summary")]
+        public async Task<IActionResult> GetTaskSummary()
+        {
+            return Ok(await dashBoardService.GetTaskSummaryAsync());
+        }
+
+        [HttpGet("today-tasks")]
+        public async Task<IActionResult> GetTodayTasks()
+        {
+            return Ok(await dashBoardService.GetTodayTasksAsync());
+        }
+
+
+
 
     }
 }
