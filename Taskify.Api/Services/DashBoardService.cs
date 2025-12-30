@@ -9,14 +9,17 @@ namespace Taskify.Api.Services
         private readonly IHabitRepository habitRepo;
         private readonly IHabitLogRepository habitLogRepo;
         private readonly IHttpContextAccessor http;
+        private readonly ITaskItemRepository taskRepo;
 
         public DashBoardService(IHabitRepository habitRepo,
             IHabitLogRepository habitLogRepo,
-            IHttpContextAccessor http)
+            IHttpContextAccessor http,
+            ITaskItemRepository taskRepo)
         {
             this.habitRepo = habitRepo;
             this.habitLogRepo = habitLogRepo;
             this.http = http;
+            this.taskRepo = taskRepo;
         }
 
         private int GetUserId() => http.HttpContext!.GetUserId();
@@ -132,6 +135,65 @@ namespace Taskify.Api.Services
                 ActiveStreaks = activeStreaks
             };
         }
+
+        public async Task<TaskSummaryDto> GetTaskSummaryAsync()
+        {
+            var userId = GetUserId();
+            var tasks = await taskRepo.GetAllAsync(userId);
+
+            var total = tasks.Count();
+            var completed = tasks.Count(t => t.IsCompleted);
+            var overdue = tasks.Count(t =>
+                !t.IsCompleted &&
+                t.DueDate != null &&
+                t.DueDate.Value.Date < DateTime.UtcNow.Date
+            );
+
+            var pending = total - completed;
+            var completionRate = total == 0
+                ? 0
+                : Math.Round((double)completed / total * 100, 2);
+
+            return new TaskSummaryDto
+            {
+                Total = total,
+                Completed = completed,
+                Pending = pending,
+                Overdue = overdue,
+                CompletionRate = completionRate
+            };
+        }
+
+        public async Task<TodayTasksSummaryDto> GetTodayTasksAsync()
+        {
+            var userId = GetUserId();
+            var today = DateTime.UtcNow.Date;
+
+            var tasks = await taskRepo.GetAllAsync(userId);
+
+            var todayTasks = tasks.Where(t =>
+                (t.DueDate != null && t.DueDate.Value.Date == today) ||
+                (t.DueDate != null && t.DueDate.Value.Date < today && !t.IsCompleted)
+            ).ToList();
+
+            return new TodayTasksSummaryDto
+            {
+                TotalTasksToday = todayTasks.Count,
+                CompletedToday = todayTasks.Count(t => t.IsCompleted),
+                PendingToday = todayTasks.Count(t => !t.IsCompleted && t.DueDate?.Date == today),
+                OverdueToday = todayTasks.Count(t => !t.IsCompleted && t.DueDate < today),
+                Tasks = todayTasks.Select(t => new TodayTaskItemDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    DueDate = t.DueDate,
+                    IsCompleted = t.IsCompleted,
+                    Priority = t.Priority
+                }).ToList()
+            };
+        }
+
+
 
     }
 }
